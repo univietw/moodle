@@ -64,7 +64,6 @@ if ($action === 'checkout') {
     echo $output->footer();
     exit;
 }
-
 if ($action === 'checkin') {
     require_sesskey();
     require_capability('tool/customlang:edit', context_system::instance());
@@ -138,6 +137,16 @@ if (has_capability('tool/customlang:edit', context_system::instance())) {
         'url'       => new moodle_url($PAGE->url, ['action' => 'checkout', 'lng' => $lng, 'next' => 'import']),
         'method'    => 'post',
     );
+}
+if (has_capability('tool/customlang:export', context_system::instance())) {
+    if(check_dir_exists(dirname($CFG->langlocalroot)) && count(glob("$CFG->langlocalroot/*"))) {
+
+        $menu['export'] = [
+            'title'     => get_string('export', 'tool_customlang'),
+            'url'       => new moodle_url($PAGE->url, ['action' => 'checkout', 'lng' => $lng, 'next' => 'export']),
+            'method'    => 'post',
+        ];
+    }
 }
 echo $output->render(new tool_customlang_menu($menu));
 
