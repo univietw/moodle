@@ -36,9 +36,10 @@ admin_externalpage_setup('toolcustomlang', '', null,
     new moodle_url('/admin/tool/customlang/import.php', ['lng' => $lng]));
 
 $form = new \tool_customlang\form\export(null, ['lng' => $lng]);
-
-if ($form->is_submitted()) {
-    $formdata = $form->get_data();
+if($form->is_cancelled()) {
+    redirect('index.php');
+    die();
+} else if ($formdata = $form->get_data()) {
     $tempzip = tempnam($CFG->tempdir . '/', 'tool_customlang_export');
     $filelist = [];
     foreach ($formdata->files as $file) {
@@ -49,8 +50,10 @@ if ($form->is_submitted()) {
     }
     $zipper = new zip_packer();
 
-    if ($zipper->archive_to_pathname($filelist, $tempzip)) {
-        send_temp_file($tempzip, get_string('exportzipfilename', 'tool_customlang', ['lang' => $lng]));
+    if ($filelist && $zipper->archive_to_pathname($filelist, $tempzip)) {
+        //Hard-coded file name so the file can be imported with automatic language detection on an instance with another systemlanguage.
+        send_temp_file($tempzip, "customlang_$lng.zip");
+        die();
     }
 }
 

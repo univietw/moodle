@@ -50,9 +50,10 @@ class export extends \moodleform {
 
         $mform->addElement('hidden', 'lng', $lng);
         $mform->setType('lng', PARAM_LANG);
-
+    
         $select = $mform->addElement('select', 'files', get_string('exportfilter', 'tool_customlang'), $fileoptions);
         $select->setMultiple(true);
+        $mform->addRule('files', get_string('required'), 'required', null, 'client');
 
         $this->add_action_buttons(true, get_string('export', 'tool_customlang'));
     }
