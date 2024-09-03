@@ -35,18 +35,10 @@ class plugininfo extends plugin implements plugin_with_configuration {
         array $fpoptions,
         ?\editor_tiny\editor $editor = null
     ): array {
-        global $PAGE;
-
-        if (empty($editor) || empty($options['autosave'])) {
-            return [
-                'autosave' => null,
-            ];
-        }
-
+        // Your values go here.
+        // These will be mapped to a namespaced EditorOption in Tiny.
         return [
-            'pagehash' => sha1($PAGE->url . '<>' . s($editor->get_text())),
-            'pageinstance' => bin2hex(random_bytes(16)),
-            'backoffTime' => (defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING) ? 0 : 500,
+            'myFirstProperty' => 'TODO Calculate your values here',
         ];
     }
 }
