@@ -27,6 +27,8 @@ use stdClass;
  */
 class change_manager {
 
+    protected $autosaveid;
+
     /** @var int The contextid */
     protected $contextid;
 
@@ -57,26 +59,27 @@ class change_manager {
         string $elementid,
         string $oldcontenthash
     ) {
+        global $DB;
         $this->contextid = $contextid;
         $this->pagehash = $pagehash;
         $this->pageinstance = $pageinstance;
         $this->elementid = $elementid;
         $this->oldcontenthash = $oldcontenthash;
+        $this->autosaveid = $DB->get_field('tiny_autosave', 'id', ['elementid' => $elementid, 'contextid' => $contextid, 'pagehash' => $pagehash]);
     }
 
     public function add_collaborative_record($newcontenthash, $changes) {
         global $DB;
 
-        $autosave = $DB->get_record('tiny_autosave', ['elementid' => $this->elementid, 'contextid' => $this->contextid, 'pagehash' =>$this->pagehash]);
         $record = new \stdClass();
         $record->oldcontenthash = $this->oldcontenthash;
         $record->newcontenthash = $newcontenthash;
         $record->timemodified = time();
         $record->changes = $changes;
-        $record->autosaveid = $autosave->id;
+        $record->autosaveid = $this->autosaveid;
 
        // try {
-            $record = $DB->insert_record('tiny_collaborative_changes', $record);
+            $record->id = $DB->insert_record('tiny_collaborative_changes', $record);
        // } catch(\Exception $e) {
       //      return "-1";
      //   }
@@ -86,8 +89,10 @@ class change_manager {
     public function get_changes() {
         global $DB;
         $changesarray = [];
-        while ($change = $DB->get_record('tiny_collaborative_changes', ['oldcontenthash' => $this->oldcontenthash])) {
+        $currenthash = $this->oldcontenthash;
+        while ($change = $DB->get_record('tiny_collaborative_changes', ['oldcontenthash' => $currenthash, 'autosaveid' => $this->autosaveid])) {
             $changesarray[] = $change->changes;
+            $currenthash = $change->newcontenthash;
         }
         return $changesarray;
     }

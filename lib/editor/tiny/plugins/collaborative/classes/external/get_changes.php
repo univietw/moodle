@@ -20,6 +20,7 @@ use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_value;
+use core_external\external_multiple_structure;
 
 /**
  * Web Service to resume an autosave session.
@@ -41,7 +42,7 @@ class get_changes extends external_api {
             'pagehash' => new external_value(PARAM_ALPHANUMEXT, 'The page hash', VALUE_REQUIRED),
             'pageinstance' => new external_value(PARAM_ALPHANUMEXT, 'The page instance', VALUE_REQUIRED),
             'elementid' => new external_value(PARAM_RAW, 'The ID of the element', VALUE_REQUIRED),
-            'hash' => new external_value(PARAM_ALPHANUMEXT, 'The ID of the element', VALUE_REQUIRED),
+            'currenthash' => new external_value(PARAM_ALPHANUMEXT, 'The ID of the element', VALUE_REQUIRED),
         ]);
     }
 
@@ -63,7 +64,7 @@ class get_changes extends external_api {
         string $pagehash,
         string $pageinstance,
         string $elementid,
-        string $hash
+        string $currenthash
     ): array {
 
         [
@@ -71,24 +72,22 @@ class get_changes extends external_api {
             'pagehash' => $pagehash,
             'pageinstance' => $pageinstance,
             'elementid' => $elementid,
-            'hash' => $hash,
+            'currenthash' => $currenthash,
         ] = self::validate_parameters(self::execute_parameters(), [
             'contextid' => $contextid,
             'pagehash' => $pagehash,
             'pageinstance' => $pageinstance,
             'elementid' => $elementid,
-            'hash' => $hash,
+            'currenthash' => $currenthash,
         ]);
 
 
         // May have been called by a non-logged in user.
         if (isloggedin() && !isguestuser()) {
-            $manager = new \tiny_collaborative\change_manager($contextid, $pagehash, $pageinstance, $elementid,$hash);
+            $manager = new \tiny_collaborative\change_manager($contextid, $pagehash, $pageinstance, $elementid, $currenthash);
             $changes = $manager->get_changes();
         }
-        return [
-            'changes' => $changes,
-        ];
+        return $changes;
     }
 
     /**
@@ -96,9 +95,10 @@ class get_changes extends external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): external_single_structure {
-        return new external_single_structure([
-            'drafttext' => new external_value(PARAM_RAW, 'The draft text'),
-        ]);
+    public static function execute_returns(): external_multiple_structure {
+        return new external_multiple_structure(new external_value(PARAM_RAW, 'Description of the change')
+
+                    // Add other fields related to the change here
+        );
     }
 }
