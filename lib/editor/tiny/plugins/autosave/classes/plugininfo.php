@@ -42,8 +42,9 @@ class plugininfo extends plugin implements plugin_with_configuration {
                 'autosave' => null,
             ];
         }
+        $pagehash = null;
         //maybe add parameter: 'pagehash' => s($editor->get_text())
-        if ($options['collaborative_enabled']) {
+        if ($options['collaborative_enabled'] ?? null) {
             $created = $DB->get_record('tiny_autosave', ['elementid' => $options['elementid'], 'contextid' => $options['contextid']], '*', IGNORE_MISSING);
             if($created) {
                 $pagehash = $created->pagehash;
