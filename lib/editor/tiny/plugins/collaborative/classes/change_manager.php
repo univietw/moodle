@@ -1,0 +1,95 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace tiny_collaborative;
+
+use stdClass;
+
+/**
+ * Autosave Manager.
+ *
+ * @package   tiny_autosave
+ * @copyright 2022 Andrew Lyons <andrew@nicols.co.uk>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class change_manager {
+
+    /** @var int The contextid */
+    protected $contextid;
+
+    /** @var string The page hash reference */
+    protected $pagehash;
+
+    /** @var string The page instance reference */
+    protected $pageinstance;
+
+    /** @var string The elementid for this editor */
+    protected $elementid;
+
+    protected $oldcontenthash;
+
+    /**
+     * Constructor for the autosave manager.
+     *
+     * @param int $contextid The contextid of the session
+     * @param string $pagehash The page hash
+     * @param string $pageinstance The page instance
+     * @param string $elementid The element id
+     * @param null|stdClass $user The user object for the owner of the autosave
+     */
+    public function __construct(
+        int $contextid,
+        string $pagehash,
+        string $pageinstance,
+        string $elementid,
+        string $oldcontenthash
+    ) {
+        $this->contextid = $contextid;
+        $this->pagehash = $pagehash;
+        $this->pageinstance = $pageinstance;
+        $this->elementid = $elementid;
+        $this->oldcontenthash = $oldcontenthash;
+    }
+
+    public function add_collaborative_record($newcontenthash, $changes) {
+        global $DB;
+
+        $autosave = $DB->get_record('tiny_autosave', ['elementid' => $this->elementid, 'contextid' => $this->contextid, 'pagehash' =>$this->pagehash]);
+        $record = new \stdClass();
+        $record->oldcontenthash = $this->oldcontenthash;
+        $record->newcontenthash = $newcontenthash;
+        $record->timemodified = time();
+        $record->changes = $changes;
+        $record->autosaveid = $autosave->id;
+
+       // try {
+            $record = $DB->insert_record('tiny_collaborative_changes', $record);
+       // } catch(\Exception $e) {
+      //      return "-1";
+     //   }
+        return $record->id;
+    }
+    
+    public function get_changes() {
+        global $DB;
+        $changesarray = [];
+        while ($change = $DB->get_record('tiny_collaborative_changes', ['oldcontenthash' => $this->oldcontenthash])) {
+            $changesarray[] = $change->changes;
+        }
+        return $changesarray;
+    }
+
+}

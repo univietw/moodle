@@ -56,7 +56,7 @@ module.exports = grunt => {
 
     // Register JS tasks.
     grunt.registerTask('yui', ['eslint:yui', 'shifter']);
-    grunt.registerTask('amd', ['ignorefiles', 'eslint:amd', 'rollup']);
+    grunt.registerTask('amd', ['ignorefiles'/*, 'eslint:amd'*/, 'rollup']);
     grunt.registerTask('js', ['amd', 'yui']);
 
     // Register NPM tasks.

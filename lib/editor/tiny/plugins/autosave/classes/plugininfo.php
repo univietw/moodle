@@ -35,17 +35,29 @@ class plugininfo extends plugin implements plugin_with_configuration {
         array $fpoptions,
         ?\editor_tiny\editor $editor = null
     ): array {
-        global $PAGE;
+        global $PAGE, $DB;
 
         if (empty($editor) || empty($options['autosave'])) {
             return [
                 'autosave' => null,
             ];
         }
-
+        $pagehash = null;
+        //maybe add parameter: 'pagehash' => s($editor->get_text())
+        if ($options['collaborative_enabled'] ?? null) {
+            $created = $DB->get_record('tiny_autosave', ['elementid' => $options['elementid'], 'contextid' => $options['contextid']], '*', IGNORE_MISSING);
+            if($created) {
+                $pagehash = $created->pagehash;
+                $pageinstance = $created->pageinstance;
+            }
+        }
+        if (!$pagehash) {
+            $pagehash = sha1($PAGE->url . '<>' . s($editor->get_text()));
+            $pageinstance = bin2hex(random_bytes(16));
+        }
         return [
-            'pagehash' => sha1($PAGE->url . '<>' . s($editor->get_text())),
-            'pageinstance' => bin2hex(random_bytes(16)),
+            'pagehash' => $pagehash,
+            'pageinstance' => $pageinstance,
             'backoffTime' => (defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING) ? 0 : 500,
         ];
     }
