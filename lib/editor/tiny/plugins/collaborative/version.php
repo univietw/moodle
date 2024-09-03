@@ -25,5 +25,5 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2024090300;
-$plugin->requires  = 2024090300;
+$plugin->requires  = 2024082900;
 $plugin->component = 'tiny_collaborative';
