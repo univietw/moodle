@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="lib/editor/tiny/plugins/collaborative/db" VERSION="20240903" COMMENT="XMLDB file for Moodle lib/editor/tiny/plugins/collaborative"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="tiny_collaborative_changes" COMMENT="Default comment for tiny_collaborative, please edit me">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="contenthashbefore" TYPE="char" LENGTH="512" NOTNULL="true" SEQUENCE="false" COMMENT="The content hash before the change"/>
+        <FIELD NAME="contenthashafter" TYPE="char" LENGTH="512" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="changes" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="autosaveid" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="contenthashbefore_unique" TYPE="unique" FIELDS="contenthashbefore"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
