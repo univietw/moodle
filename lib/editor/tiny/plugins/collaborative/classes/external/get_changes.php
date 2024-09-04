@@ -80,7 +80,7 @@ class get_changes extends external_api {
 
         // May have been called by a non-logged in user.
         if (isloggedin() && !isguestuser()) {
-            $manager = new \tiny_collaborative\change_manager($contextid, $pagehash, $pageinstance, $elementid, $currenthash);
+            $manager = new \tiny_collaborative\change_manager($contextid, $pagehash, $elementid, $currenthash);
             $changes = $manager->get_changes();
         }
         return $changes;

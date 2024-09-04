@@ -74,8 +74,8 @@ class change_manager {
         $record->timemodified = time();
         $record->changes = $changes;
         $record->pagehash = $this->pagehash;
+        $record->contextid = $this->contextid;
         $record->elementid = $this->elementid;
-        $record->oldcontenthash = $this->oldcontenthash;
         $record->userid = $USER->id;
 
        // try {
@@ -91,7 +91,7 @@ class change_manager {
         $changesarray = [];
         $currenthash = $this->oldcontenthash;
         while ($change = $DB->get_record('tiny_collaborative_changes', ['oldcontenthash' => $currenthash, 
-            'pagehash' => $this->$pagehash,
+            'pagehash' => $this->pagehash,
             'elementid' => $this->elementid,
             'contextid' => $this->contextid
         ]
