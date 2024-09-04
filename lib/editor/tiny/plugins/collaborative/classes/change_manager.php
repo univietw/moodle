@@ -55,14 +55,12 @@ class change_manager {
     public function __construct(
         int $contextid,
         string $pagehash,
-        string $pageinstance,
         string $elementid,
         string $oldcontenthash
     ) {
         global $DB;
         $this->contextid = $contextid;
         $this->pagehash = $pagehash;
-        $this->pageinstance = $pageinstance;
         $this->elementid = $elementid;
         $this->oldcontenthash = $oldcontenthash;
     }
@@ -95,7 +93,8 @@ class change_manager {
         while ($change = $DB->get_record('tiny_collaborative_changes', ['oldcontenthash' => $currenthash, 
             'pagehash' => $this->$pagehash,
             'elementid' => $this->elementid,
-            'contextid' => $this->contextid,
+            'contextid' => $this->contextid
+        ]
         )) {
             $changesarray[] = $change->changes;
             $currenthash = $change->newcontenthash;
