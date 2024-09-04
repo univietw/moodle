@@ -81,10 +81,10 @@ class save_changes extends external_api {
         // May have been called by a non-logged in user.
         if (isloggedin() && !isguestuser()) {
             $manager = new \tiny_collaborative\change_manager($contextid, $elementid, $oldcontenthash);
-            $manager->add_collaborative_record($oldid, $newcontenthash, $changes);
+            $id = $manager->add_collaborative_record($oldid, $newcontenthash, $changes);
         }
 
-        return [];
+        return $id;
     }
 
     /**
@@ -92,7 +92,7 @@ class save_changes extends external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): external_single_structure {
-        return new external_single_structure([]);
+    public static function execute_returns(): external_value {
+        return new external_value(PARAM_INT, 'The new id of your entry');
     }
 }
