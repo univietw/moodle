@@ -124,7 +124,7 @@ class change_manager {
             ])) {
                 $changesarray[] = [ 
                     'id' => $change->id,
-                    'changes' => $change->changes,
+                    'change' => $change->changes,
                     'newcontenthash' => $change->newcontenthash
                     ];
                 $currenthash = $change->newcontenthash;
