@@ -112,7 +112,7 @@ class change_manager {
             foreach ($changes as $change) {
                 $changesarray[] = [
                     'id' => $change->id,
-                    'changes' => $change->changes,
+                    'change' => $change->changes,
                     'newcontenthash' => $change->newcontenthash
                 ];
             }
