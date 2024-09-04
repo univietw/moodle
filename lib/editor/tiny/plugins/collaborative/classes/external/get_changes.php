@@ -91,8 +91,8 @@ class get_changes extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure( 
-            ['changes' => new external_multiple_structure(PARAM_RAW, 'Description of the change'),
-            'positions' => new external_multiple_structure(PARAM_RAW, 'Positions of the users')]
+            ['changes' => new external_multiple_structure(new external_value(PARAM_RAW, 'Description of the change')),
+                'positions' => new external_multiple_structure(new external_value(PARAM_RAW, 'Positions of the users'))]
         );
     }
 }
