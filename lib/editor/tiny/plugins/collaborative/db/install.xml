@@ -11,7 +11,6 @@
         <FIELD NAME="newcontenthash" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="changes" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="pagehash" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="elementid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -20,8 +19,22 @@
         <KEY NAME="oldcontenthash_unique" TYPE="unique" FIELDS="oldcontenthash"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="colabsearch" UNIQUE="false" FIELDS="pagehash, elementid, contextid"/>
+        <INDEX NAME="colabsearch" UNIQUE="false" FIELDS="elementid, contextid"/>
       </INDEXES>
+    </TABLE>
+    <TABLE NAME="tiny_collaborative_positions" COMMENT="The positions of the users in the document">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="elementid" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="pageinstance" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="position" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
     </TABLE>
   </TABLES>
 </XMLDB>

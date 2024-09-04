@@ -41,7 +41,8 @@ class get_changes extends external_api {
         return new external_function_parameters([
             'contextid' => new external_value(PARAM_INT, 'The context id that owns the editor', VALUE_REQUIRED),
             'elementid' => new external_value(PARAM_RAW, 'The ID of the element', VALUE_REQUIRED),
-            'currenthash' => new external_value(PARAM_ALPHANUMEXT, 'The ID of the element', VALUE_REQUIRED),
+            'pageinstance' => new external_value(PARAM_RAW, 'The ID of the pageinstance', VALUE_REQUIRED),
+            'position' => new external_value(PARAM_RAW, 'The position of the user', VALUE_REQUIRED),
         ]);
     }
 
@@ -52,6 +53,7 @@ class get_changes extends external_api {
      * silently return and this is not treated as an error condition.
      *
      * @param int $contextid The context id of the owner
+     * @param string $pagehash The hash of the page
      * @param string $pageinstance The instance id of the page
      * @param string $elementid The id of the element
      * @param int $draftid The id of the draftid to resume to
@@ -59,29 +61,30 @@ class get_changes extends external_api {
      */
     public static function execute(
         int $contextid,
-       string $elementid,
-        string $currenthash
+        string $elementid,
+        string $pageinstance,
+        string $position
     ): array {
 
         [
             'contextid' => $contextid,
             'elementid' => $elementid,
-            'currenthash' => $currenthash,
-        ] = self::validate_parameters(self::execute_parameters(), [
-            'contextid' => $contextid,
-            'elementid' => $elementid,
-            'currenthash' => $currenthash,
+            'pageinstance' => $pageinstance,
+            'position' => $position,
+            ] = self::validate_parameters(self::execute_parameters(), [
+                'contextid' => $contextid,
+                'elementid' => $elementid,
+                'pageinstance' => $pageinstance,
+                'position' => $position,
         ]);
 
 
         // May have been called by a non-logged in user.
         if (isloggedin() && !isguestuser()) {
-            $manager = new \tiny_collaborative\change_manager($contextid, $elementid, $currenthash);
-            $changes = $manager->get_changes();
-            $positionmanager = new tiny_collaborative\position_manager($contextid, $elementid);
-            $positions = $positionmanager->get_user_positions();
+            $manager = new \tiny_collaborative\position_manager($contextid,$elementid);
+            $value = $manager->set_position($pageinstance, $position);
         }
-        return ['changes' => $changes, 'positions' => $positions];
+        return $value;
     }
 
     /**
@@ -89,10 +92,7 @@ class get_changes extends external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): external_single_structure {
-        return new external_single_structure( 
-            ['changes' => new external_multiple_structure(new external_value(PARAM_RAW, 'Description of the change')),
-                'positions' => new external_multiple_structure(new external_value(PARAM_RAW, 'Positions of the users'))]
-        );
+    public static function execute_returns(): external_value {
+        return new external_value(PARAM_INT, 'The ID of the position entry');
     }
 }

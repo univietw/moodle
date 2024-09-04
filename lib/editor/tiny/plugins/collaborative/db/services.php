@@ -41,4 +41,12 @@ $functions = [
         'loginrequired' => false,
         'ajax' => true,
     ),
+    'tiny_collaborate_set_position' => array(
+        'classname' => 'tiny_collaborative\external\set_position',
+        'methodname' => 'execute',
+        'description' => 'Set the position where the user is at the moment',
+        'type' => 'write',
+        'loginrequired' => false,
+        'ajax' => true,
+    ),
 ];
