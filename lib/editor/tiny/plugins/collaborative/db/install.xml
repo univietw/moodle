@@ -19,7 +19,7 @@
         <KEY NAME="oldcontenthash_unique" TYPE="unique" FIELDS="oldcontenthash"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="colabsearch" UNIQUE="false" FIELDS="pagehash, elementid, contextid"/>
+        <INDEX NAME="colabsearch" UNIQUE="false" FIELDS="elementid, contextid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="tiny_collaborative_positions" COMMENT="The positions of the users in the document">

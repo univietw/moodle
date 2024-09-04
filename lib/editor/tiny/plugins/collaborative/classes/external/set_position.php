@@ -92,12 +92,7 @@ class get_changes extends external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns(): external_single_structure {
-        return new external_single_structure( ['changes' =>
-            new external_multiple_structure(PARAM_RAW, 'Description of the change'),
-            'positions' => new external_multiple_structure(PARAM_RAW, '')
-
-                    // Add other fields related to the change here
-        );
+    public static function execute_returns(): external_value {
+        return new external_value(PARAM_INT, 'The ID of the position entry');
     }
 }

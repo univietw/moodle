@@ -42,9 +42,9 @@ $functions = [
         'ajax' => true,
     ),
     'tiny_collaborate_set_position' => array(
-        'classname' => 'tiny_collaborative\external\save_changes',
+        'classname' => 'tiny_collaborative\external\set_position',
         'methodname' => 'execute',
-        'description' => 'Save changes the user made in a collaborative session',
+        'description' => 'Set the position where the user is at the moment',
         'type' => 'write',
         'loginrequired' => false,
         'ajax' => true,
