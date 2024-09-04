@@ -48,12 +48,11 @@ class position_manager {
         int $contextid,
         string $elementid
         ) {
-            global $DB;
             $this->contextid = $contextid;
             $this->elementid = $elementid;
     }
     
-    public function set_position($pageinstance,$position) {
+    public function set_position($pageinstance, $position) {
         global $DB,$USER;
         
         $record = $DB->get_record('tiny_collaborative_positions',[
@@ -80,13 +79,13 @@ class position_manager {
     
     public function get_user_positions() {
         global $DB;
-        $positions = [];
         $records = $DB->get_records('tiny_collaborative_positions', [
             'elementid' => $this->elementid,
             'contextid' => $this->contextid]);
         $positions = [];
         foreach ($records as $record) {
-            $positions[] = [$record->userid => $record->position];
+            $positions[] = ['userid' => $record->userid,
+                            'position' => $record->position];
         }
         return $positions;
     }

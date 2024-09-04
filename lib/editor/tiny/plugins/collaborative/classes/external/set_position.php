@@ -21,6 +21,7 @@ use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_value;
 use core_external\external_multiple_structure;
+use moodle_exception;
 use tiny_collaborative;
 
 /**
@@ -31,7 +32,7 @@ use tiny_collaborative;
  * @copyright 2022 Andrew Lyons <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_changes extends external_api {
+class set_position extends external_api {
     /**
      * Returns description of method parameters
      *
@@ -53,18 +54,18 @@ class get_changes extends external_api {
      * silently return and this is not treated as an error condition.
      *
      * @param int $contextid The context id of the owner
-     * @param string $pagehash The hash of the page
-     * @param string $pageinstance The instance id of the page
      * @param string $elementid The id of the element
-     * @param int $draftid The id of the draftid to resume to
-     * @return null
+     * @param string $pageinstance The instance id of the page
+     * @param string $position
+     * @returns int
+     * @throws moodle_exception
      */
     public static function execute(
         int $contextid,
         string $elementid,
         string $pageinstance,
         string $position
-    ): array {
+    ): int {
 
         [
             'contextid' => $contextid,
@@ -78,10 +79,10 @@ class get_changes extends external_api {
                 'position' => $position,
         ]);
 
-
+        $value = -1;
         // May have been called by a non-logged in user.
         if (isloggedin() && !isguestuser()) {
-            $manager = new \tiny_collaborative\position_manager($contextid,$elementid);
+            $manager = new \tiny_collaborative\position_manager($contextid, $elementid);
             $value = $manager->set_position($pageinstance, $position);
         }
         return $value;
@@ -90,7 +91,7 @@ class get_changes extends external_api {
     /**
      * Describe the return structure of the external service.
      *
-     * @return external_single_structure
+     * @return external_value
      */
     public static function execute_returns(): external_value {
         return new external_value(PARAM_INT, 'The ID of the position entry');
