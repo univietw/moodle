@@ -68,7 +68,7 @@ class change_manager {
             $lock = $lockfactory->get_lock($resourcename, 1);
             if($lock) {
                 $DB->record_exists_sql($sql, ['contextid' => $this->contextid, 'elementid' => $this->elementid, 'id' => $id]);
-                if(!get_changes($id)) {
+                if(!$this->get_changes($id)) {
                     $record = new \stdClass();
                     $record->oldcontenthash = $this->oldcontenthash;
                     $record->newcontenthash = $newcontenthash;

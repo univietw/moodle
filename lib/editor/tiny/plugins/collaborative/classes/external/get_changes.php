@@ -99,7 +99,7 @@ class get_changes extends external_api {
             ['changes' => new external_multiple_structure( 
                            new external_single_structure([
                                'id' => new external_value(PARAM_INT, 'Database ID of the change'),
-                               'change' => external_value(PARAM_RAW, 'Description of the change'),
+                               'change' => new external_value(PARAM_RAW, 'Description of the change'),
                                'newcontenthash' => new external_value(PARAM_RAW, 'hash after the change')
                            ])),
              'positions' => new external_multiple_structure(

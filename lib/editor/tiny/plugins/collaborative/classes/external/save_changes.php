@@ -52,7 +52,7 @@ class save_changes extends external_api {
      * @param string $pageinstance The instance id of the page
      * @param string $elementid The id of the element
      * @param string $drafttext The text to store
-     * @return null
+     * @return int
      */
     public static function execute(
         int $contextid,
@@ -61,7 +61,7 @@ class save_changes extends external_api {
         string $newcontenthash,
         string $changes,
         int $oldid
-    ): array {
+    ): int {
 
         [
             'contextid' => $contextid,
@@ -90,7 +90,7 @@ class save_changes extends external_api {
     /**
      * Describe the return structure of the external service.
      *
-     * @return external_single_structure
+     * @return external_value
      */
     public static function execute_returns(): external_value {
         return new external_value(PARAM_INT, 'The new id of your entry');
