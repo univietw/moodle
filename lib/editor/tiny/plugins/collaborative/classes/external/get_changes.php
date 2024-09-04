@@ -42,7 +42,7 @@ class get_changes extends external_api {
             'contextid' => new external_value(PARAM_INT, 'The context id that owns the editor', VALUE_REQUIRED),
             'elementid' => new external_value(PARAM_RAW, 'The ID of the element', VALUE_REQUIRED),
             'currenthash' => new external_value(PARAM_ALPHANUMEXT, 'The ID of the element', VALUE_REQUIRED),
-            'oldid' => new external_value(PARAM_INT, 'The ID of the element', VALUE_OPTIONAL),
+            'oldid' => new external_value(PARAM_INT, 'The ID of the element', VALUE_OPTIONAL, 0),
         ]);
     }
 
