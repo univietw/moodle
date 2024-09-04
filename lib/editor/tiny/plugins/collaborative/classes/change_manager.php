@@ -55,45 +55,80 @@ class change_manager {
         $this->oldcontenthash = $oldcontenthash;
     }
 
-    public function add_collaborative_record($newcontenthash, $changes) {
+    public function add_collaborative_record($id,$newcontenthash, $changes) {
         global $DB,$USER;
-
-        if ($record = $DB->get_record('tiny_collaborative_changes', [
-            'newcontenthash' => $newcontenthash,
-            'elementid' => $this->elementid,
-            'contextid' => $this->contextid
-        ])) {
+        if($id) {
+            $lockfactory = \core\lock\lock_config::get_lock_factory('moodle');
+            $resourcename = 'tiny_collaborative_changes'. $id;
+            $sql = "SELECT *
+                FROM {tiny_collaborative_changes}
+                WHERE contextid = :contextid
+                AND elementid = :elementid
+                AND id > :id";
+            $lock = $lockfactory->get_lock($resourcename, 1);
+            if($lock) {
+                $DB->record_exists_sql($sql, ['contextid' => $this->contextid, 'elementid' => $this->elementid, 'id' => $id]);
+                if(!get_changes($id)) {
+                    $record = new \stdClass();
+                    $record->oldcontenthash = $this->oldcontenthash;
+                    $record->newcontenthash = $newcontenthash;
+                    $record->timemodified = time();
+                    $record->changes = $changes;
+                    $record->contextid = $this->contextid;
+                    $record->elementid = $this->elementid;
+                    $record->userid = $USER->id;
+                    $record->id = $DB->insert_record('tiny_collaborative_changes', $record);
+                    $lock->release();
+                    return $record->id;
+                } else {
+                    $lock->release();
+                }
+                return -1;
+            }
+        } else {
+            $record = new \stdClass();
+            $record->oldcontenthash = $this->oldcontenthash;
+            $record->newcontenthash = $newcontenthash;
+            $record->timemodified = time();
+            $record->changes = $changes;
+            $record->contextid = $this->contextid;
+            $record->elementid = $this->elementid;
+            $record->userid = $USER->id;
+            $record->id = $DB->insert_record('tiny_collaborative_changes', $record);
             return $record->id;
         }
-
-        $record = new \stdClass();
-        $record->oldcontenthash = $this->oldcontenthash;
-        $record->newcontenthash = $newcontenthash;
-        $record->timemodified = time();
-        $record->changes = $changes;
-        $record->contextid = $this->contextid;
-        $record->elementid = $this->elementid;
-        $record->userid = $USER->id;
-
-
-       try {
-            $record->id = $DB->insert_record('tiny_collaborative_changes', $record);
-       } catch(\Exception $e) {
-           return "-1";
-       }
-        return $record->id;
     }
-    
-    public function get_changes() {
+
+    public function get_changes($id = 0) {
         global $DB;
         $changesarray = [];
-        $currenthash = $this->oldcontenthash;
-        while ($change = $DB->get_record('tiny_collaborative_changes', ['oldcontenthash' => $currenthash,
-            'elementid' => $this->elementid,
-            'contextid' => $this->contextid
-        ])) {
-            $changesarray[] = $change->changes;
-            $currenthash = $change->newcontenthash;
+        if($id) {
+            $sql = "SELECT * 
+                      FROM {tiny_collaborative_changes}
+                      WHERE contextid = :contextid
+                        AND elementid = :elementid
+                        AND id > :id";
+            $changes = $DB->get_record_sql($sql,['contextid' => $this->contextid, 'elementid' => $this->elementid, 'id'=> $id]);
+            foreach ($changes as $change) {
+                $changesarray[] = [
+                    'id' => $change->id,
+                    'changes' => $change->changes,
+                    'newcontenthash' => $change->newcontenthash
+                ];
+            }
+        } else {
+            $currenthash = $this->oldcontenthash;
+            while ($change = $DB->get_record('tiny_collaborative_changes', ['oldcontenthash' => $currenthash,
+                'elementid' => $this->elementid,
+                'contextid' => $this->contextid
+            ])) {
+                $changesarray[] = [ 
+                    'id' => $change->id,
+                    'changes' => $change->changes,
+                    'newcontenthash' => $change->newcontenthash
+                    ];
+                $currenthash = $change->newcontenthash;
+            }
         }
         return $changesarray;
     }

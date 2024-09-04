@@ -42,6 +42,7 @@ class get_changes extends external_api {
             'contextid' => new external_value(PARAM_INT, 'The context id that owns the editor', VALUE_REQUIRED),
             'elementid' => new external_value(PARAM_RAW, 'The ID of the element', VALUE_REQUIRED),
             'currenthash' => new external_value(PARAM_ALPHANUMEXT, 'The ID of the element', VALUE_REQUIRED),
+            'oldid' => new external_value(PARAM_ALPHANUMEXT, 'The ID of the element', VALUE_OPTIONAL),
         ]);
     }
 
@@ -60,24 +61,27 @@ class get_changes extends external_api {
     public static function execute(
         int $contextid,
        string $elementid,
-        string $currenthash
+        string $currenthash,
+        string $oldid
     ): array {
 
         [
             'contextid' => $contextid,
             'elementid' => $elementid,
             'currenthash' => $currenthash,
+            'oldid' => $oldid
         ] = self::validate_parameters(self::execute_parameters(), [
             'contextid' => $contextid,
             'elementid' => $elementid,
             'currenthash' => $currenthash,
+            'oldid' => $oldid
         ]);
 
 
         // May have been called by a non-logged in user.
         if (isloggedin() && !isguestuser()) {
             $manager = new \tiny_collaborative\change_manager($contextid, $elementid, $currenthash);
-            $changes = $manager->get_changes();
+            $changes = $manager->get_changes($oldid);
             $positionmanager = new tiny_collaborative\position_manager($contextid, $elementid);
             $positions = $positionmanager->get_user_positions();
         }
@@ -91,8 +95,13 @@ class get_changes extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure( 
-            ['changes' => new external_multiple_structure(new external_value(PARAM_RAW, 'Description of the change')),
-                'positions' => new external_multiple_structure(new external_value(PARAM_RAW, 'Positions of the users'))]
+            ['changes' => new external_multiple_structure( 
+                           new external_single_structure([
+                               'id' => new external_value(PARAM_INT, 'Database ID of the change'),
+                               'change' => external_value(PARAM_RAW, 'Description of the change'),
+                               'newcontenthash' => new external_value(PARAM_RAW, 'hash after the change')
+                           ])),
+             'positions' => new external_multiple_structure(new external_value(PARAM_RAW, 'Positions of the users'))]
         );
     }
 }

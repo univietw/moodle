@@ -42,6 +42,7 @@ class save_changes extends external_api {
             'oldcontenthash' => new external_value(PARAM_ALPHANUMEXT, 'The hash of the old status', VALUE_REQUIRED),
             'newcontenthash' => new external_value(PARAM_ALPHANUMEXT, 'The hash of the new status', VALUE_REQUIRED),
             'changes' => new external_value(PARAM_RAW, 'The changes done between old and new hash', VALUE_REQUIRED),
+            'oldid' => new external_value(PARAM_INT, 'The old changesid the user is referring to', VALUE_OPTIONAL),
         ]);
     }
 
@@ -58,7 +59,8 @@ class save_changes extends external_api {
         string $elementid,
         string $oldcontenthash,
         string $newcontenthash,
-        string $changes
+        string $changes,
+        int $oldid
     ): array {
 
         [
@@ -66,18 +68,20 @@ class save_changes extends external_api {
             'elementid' => $elementid,
             'oldcontenthash' => $oldcontenthash,
             'newcontenthash' => $newcontenthash,
-            'changes' => $changes
+            'changes' => $changes,
+            'oldid' => $oldid
         ] = self::validate_parameters(self::execute_parameters(), [
             'contextid' => $contextid,
             'elementid' => $elementid,
             'oldcontenthash' => $oldcontenthash,
             'newcontenthash' => $newcontenthash,
-            'changes' => $changes
+            'changes' => $changes,
+            'oldid' => $oldid
         ]);
         // May have been called by a non-logged in user.
         if (isloggedin() && !isguestuser()) {
             $manager = new \tiny_collaborative\change_manager($contextid, $elementid, $oldcontenthash);
-            $manager->add_collaborative_record($newcontenthash, $changes);
+            $manager->add_collaborative_record($oldid, $newcontenthash, $changes);
         }
 
         return [];
