@@ -25,76 +25,70 @@ use stdClass;
  * @copyright 2022 Andrew Lyons <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class change_manager {
+class position_manager {
 
     /** @var int The contextid */
     protected $contextid;
-
+    
     /** @var string The page hash reference */
     protected $pagehash;
 
     /** @var string The elementid for this editor */
     protected $elementid;
 
-    protected $oldcontenthash;
-
     /**
      * Constructor for the autosave manager.
      *
      * @param int $contextid The contextid of the session
-     * @param string $pagehash The page hash
      * @param string $pageinstance The page instance
      * @param string $elementid The element id
      * @param null|stdClass $user The user object for the owner of the autosave
      */
     public function __construct(
         int $contextid,
-        string $pagehash,
-        string $elementid,
-        string $oldcontenthash
-    ) {
-        global $DB;
-        $this->contextid = $contextid;
-        $this->pagehash = $pagehash;
-        $this->elementid = $elementid;
-        $this->oldcontenthash = $oldcontenthash;
+        string $elementid
+        ) {
+            global $DB;
+            $this->contextid = $contextid;
+            $this->elementid = $elementid;
     }
-
-    public function add_collaborative_record($newcontenthash, $changes) {
+    
+    public function set_position($pageinstance,$position) {
         global $DB,$USER;
-
-        $record = new \stdClass();
-        $record->oldcontenthash = $this->oldcontenthash;
-        $record->newcontenthash = $newcontenthash;
-        $record->timemodified = time();
-        $record->changes = $changes;
-        $record->pagehash = $this->pagehash;
-        $record->elementid = $this->elementid;
-        $record->oldcontenthash = $this->oldcontenthash;
-        $record->userid = $USER->id;
-
-       try {
-            $record->id = $DB->insert_record('tiny_collaborative_changes', $record);
-       } catch(\Exception $e) {
-           return "-1";
-       }
+        
+        $record = $DB->get_record('tiny_collaborative_positions',[
+            'contextid' => $this->contextid,
+            'elementid' => $this->elementid,
+            'pageinstance' => $pageinstance
+        ]);
+        if($record) {
+            $record->position = $position;
+            $record->timemodified = time();
+            $DB->update_record('tiny_collaborative_positions', $record);
+        } else {
+            $record = new \stdClass();
+            $record->timemodified = time();
+            $record->elementid = $this->elementid;
+            $record->userid = $USER->id;
+            $record->contextid = $this->contextid;
+            $record->pageinstance = $pageinstance;
+            $record->position = $position;
+            $record = $DB->insert_record('tiny_collaborative_positions', $record);
+        }
         return $record->id;
     }
     
-    public function get_changes() {
+    public function get_user_positions() {
         global $DB;
-        $changesarray = [];
-        $currenthash = $this->oldcontenthash;
-        while ($change = $DB->get_record('tiny_collaborative_changes', ['oldcontenthash' => $currenthash, 
-            'pagehash' => $this->pagehash,
+        $positions = [];
+        $records = $DB->get_records('tiny_collaborative_positions', [
             'elementid' => $this->elementid,
-            'contextid' => $this->contextid
-        ]
-        )) {
-            $changesarray[] = $change->changes;
-            $currenthash = $change->newcontenthash;
+            'contextid' => $this->contextid]);
+        $positions = [];
+        foreach ($records as $record) {
+            $positions[] = [$record->userid => $record->position];
         }
-        return $changesarray;
+        return $positions;
     }
-
+    
 }

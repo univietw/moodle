@@ -41,4 +41,12 @@ $functions = [
         'loginrequired' => false,
         'ajax' => true,
     ),
+    'tiny_collaborate_set_position' => array(
+        'classname' => 'tiny_collaborative\external\save_changes',
+        'methodname' => 'execute',
+        'description' => 'Save changes the user made in a collaborative session',
+        'type' => 'write',
+        'loginrequired' => false,
+        'ajax' => true,
+    ),
 ];
