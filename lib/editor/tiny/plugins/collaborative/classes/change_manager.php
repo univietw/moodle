@@ -68,6 +68,15 @@ class change_manager {
     public function add_collaborative_record($newcontenthash, $changes) {
         global $DB,$USER;
 
+        if ($record = $DB->get_record('tiny_collaborative_changes', [
+            'newcontenthash' => $newcontenthash,
+           // 'pagehash' => $this->pagehash,
+            'elementid' => $this->elementid,
+            'contextid' => $this->contextid
+        ])) {
+            return $record->id;
+        }
+
         $record = new \stdClass();
         $record->oldcontenthash = $this->oldcontenthash;
         $record->newcontenthash = $newcontenthash;
@@ -79,7 +88,7 @@ class change_manager {
         $record->userid = $USER->id;
 
        // try {
-            $record->id = $DB->insert_record('tiny_collaborative_changes', $record);
+        $record->id = $DB->insert_record('tiny_collaborative_changes', $record);
        // } catch(\Exception $e) {
       //      return "-1";
      //   }
@@ -91,11 +100,10 @@ class change_manager {
         $changesarray = [];
         $currenthash = $this->oldcontenthash;
         while ($change = $DB->get_record('tiny_collaborative_changes', ['oldcontenthash' => $currenthash, 
-            'pagehash' => $this->pagehash,
+        //    'pagehash' => $this->pagehash,
             'elementid' => $this->elementid,
             'contextid' => $this->contextid
-        ]
-        )) {
+        ])) {
             $changesarray[] = $change->changes;
             $currenthash = $change->newcontenthash;
         }
