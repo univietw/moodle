@@ -72,7 +72,7 @@ class position_manager {
             $record->contextid = $this->contextid;
             $record->pageinstance = $pageinstance;
             $record->position = $position;
-            $record = $DB->insert_record('tiny_collaborative_positions', $record);
+            $record->id = $DB->insert_record('tiny_collaborative_positions', $record);
         }
         return $record->id;
     }
