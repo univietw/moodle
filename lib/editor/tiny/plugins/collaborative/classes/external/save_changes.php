@@ -42,7 +42,7 @@ class save_changes extends external_api {
             'oldcontenthash' => new external_value(PARAM_ALPHANUMEXT, 'The hash of the old status', VALUE_REQUIRED),
             'newcontenthash' => new external_value(PARAM_ALPHANUMEXT, 'The hash of the new status', VALUE_REQUIRED),
             'changes' => new external_value(PARAM_RAW, 'The changes done between old and new hash', VALUE_REQUIRED),
-            'oldid' => new external_value(PARAM_INT, 'The old changesid the user is referring to', VALUE_OPTIONAL),
+            'oldid' => new external_value(PARAM_INT, 'The old changesid the user is referring to', VALUE_OPTIONAL, 0),
         ]);
     }
 
