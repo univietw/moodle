@@ -30,9 +30,6 @@ class change_manager {
     /** @var int The contextid */
     protected $contextid;
 
-    /** @var string The page hash reference */
-    protected $pagehash;
-
     /** @var string The elementid for this editor */
     protected $elementid;
 
@@ -49,13 +46,11 @@ class change_manager {
      */
     public function __construct(
         int $contextid,
-        string $pagehash,
         string $elementid,
         string $oldcontenthash
     ) {
         global $DB;
         $this->contextid = $contextid;
-        $this->pagehash = $pagehash;
         $this->elementid = $elementid;
         $this->oldcontenthash = $oldcontenthash;
     }
@@ -63,15 +58,23 @@ class change_manager {
     public function add_collaborative_record($newcontenthash, $changes) {
         global $DB,$USER;
 
+        if ($record = $DB->get_record('tiny_collaborative_changes', [
+            'newcontenthash' => $newcontenthash,
+            'elementid' => $this->elementid,
+            'contextid' => $this->contextid
+        ])) {
+            return $record->id;
+        }
+
         $record = new \stdClass();
         $record->oldcontenthash = $this->oldcontenthash;
         $record->newcontenthash = $newcontenthash;
         $record->timemodified = time();
         $record->changes = $changes;
-        $record->pagehash = $this->pagehash;
+        $record->contextid = $this->contextid;
         $record->elementid = $this->elementid;
-        $record->oldcontenthash = $this->oldcontenthash;
         $record->userid = $USER->id;
+
 
        try {
             $record->id = $DB->insert_record('tiny_collaborative_changes', $record);
@@ -85,12 +88,10 @@ class change_manager {
         global $DB;
         $changesarray = [];
         $currenthash = $this->oldcontenthash;
-        while ($change = $DB->get_record('tiny_collaborative_changes', ['oldcontenthash' => $currenthash, 
-            'pagehash' => $this->pagehash,
+        while ($change = $DB->get_record('tiny_collaborative_changes', ['oldcontenthash' => $currenthash,
             'elementid' => $this->elementid,
             'contextid' => $this->contextid
-        ]
-        )) {
+        ])) {
             $changesarray[] = $change->changes;
             $currenthash = $change->newcontenthash;
         }

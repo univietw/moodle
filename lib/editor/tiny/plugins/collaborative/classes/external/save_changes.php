@@ -38,7 +38,6 @@ class save_changes extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'contextid' => new external_value(PARAM_INT, 'The context id that owns the editor', VALUE_REQUIRED),
-            'pagehash' => new external_value(PARAM_ALPHANUMEXT, 'The page hash', VALUE_REQUIRED),
             'elementid' => new external_value(PARAM_RAW, 'The ID of the element', VALUE_REQUIRED),
             'oldcontenthash' => new external_value(PARAM_ALPHANUMEXT, 'The hash of the old status', VALUE_REQUIRED),
             'newcontenthash' => new external_value(PARAM_ALPHANUMEXT, 'The hash of the new status', VALUE_REQUIRED),
@@ -49,7 +48,6 @@ class save_changes extends external_api {
     /**
      * 
      * @param int $contextid The context id of the owner
-     * @param string $pagehash The hash of the page
      * @param string $pageinstance The instance id of the page
      * @param string $elementid The id of the element
      * @param string $drafttext The text to store
@@ -57,7 +55,6 @@ class save_changes extends external_api {
      */
     public static function execute(
         int $contextid,
-        string $pagehash,
         string $elementid,
         string $oldcontenthash,
         string $newcontenthash,
@@ -66,14 +63,12 @@ class save_changes extends external_api {
 
         [
             'contextid' => $contextid,
-            'pagehash' => $pagehash,
             'elementid' => $elementid,
             'oldcontenthash' => $oldcontenthash,
             'newcontenthash' => $newcontenthash,
             'changes' => $changes
         ] = self::validate_parameters(self::execute_parameters(), [
             'contextid' => $contextid,
-            'pagehash' => $pagehash,
             'elementid' => $elementid,
             'oldcontenthash' => $oldcontenthash,
             'newcontenthash' => $newcontenthash,
@@ -81,7 +76,7 @@ class save_changes extends external_api {
         ]);
         // May have been called by a non-logged in user.
         if (isloggedin() && !isguestuser()) {
-            $manager = new \tiny_collaborative\change_manager($contextid, $pagehash, $elementid, $oldcontenthash);
+            $manager = new \tiny_collaborative\change_manager($contextid, $elementid, $oldcontenthash);
             $manager->add_collaborative_record($newcontenthash, $changes);
         }
 

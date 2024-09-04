@@ -40,7 +40,6 @@ class get_changes extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'contextid' => new external_value(PARAM_INT, 'The context id that owns the editor', VALUE_REQUIRED),
-            'pagehash' => new external_value(PARAM_ALPHANUMEXT, 'The page hash', VALUE_REQUIRED),
             'elementid' => new external_value(PARAM_RAW, 'The ID of the element', VALUE_REQUIRED),
             'currenthash' => new external_value(PARAM_ALPHANUMEXT, 'The ID of the element', VALUE_REQUIRED),
         ]);
@@ -53,7 +52,6 @@ class get_changes extends external_api {
      * silently return and this is not treated as an error condition.
      *
      * @param int $contextid The context id of the owner
-     * @param string $pagehash The hash of the page
      * @param string $pageinstance The instance id of the page
      * @param string $elementid The id of the element
      * @param int $draftid The id of the draftid to resume to
@@ -61,19 +59,16 @@ class get_changes extends external_api {
      */
     public static function execute(
         int $contextid,
-        string $pagehash,
-        string $elementid,
+       string $elementid,
         string $currenthash
     ): array {
 
         [
             'contextid' => $contextid,
-            'pagehash' => $pagehash,
             'elementid' => $elementid,
             'currenthash' => $currenthash,
         ] = self::validate_parameters(self::execute_parameters(), [
             'contextid' => $contextid,
-            'pagehash' => $pagehash,
             'elementid' => $elementid,
             'currenthash' => $currenthash,
         ]);
@@ -81,9 +76,9 @@ class get_changes extends external_api {
 
         // May have been called by a non-logged in user.
         if (isloggedin() && !isguestuser()) {
-            $manager = new \tiny_collaborative\change_manager($contextid, $pagehash, $pageinstance, $elementid, $currenthash);
+            $manager = new \tiny_collaborative\change_manager($contextid, $elementid, $currenthash);
             $changes = $manager->get_changes();
-            $positionmanager = new tiny_collaborative\position_manager($contextid,$pagehash,$elementid);
+            $positionmanager = new tiny_collaborative\position_manager($contextid, $elementid);
             $positions = $positionmanager->get_user_positions();
         }
         return ['changes' => $changes, 'positions' => $positions];
