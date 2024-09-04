@@ -40,7 +40,6 @@ class get_changes extends external_api {
         return new external_function_parameters([
             'contextid' => new external_value(PARAM_INT, 'The context id that owns the editor', VALUE_REQUIRED),
             'pagehash' => new external_value(PARAM_ALPHANUMEXT, 'The page hash', VALUE_REQUIRED),
-            'pageinstance' => new external_value(PARAM_ALPHANUMEXT, 'The page instance', VALUE_REQUIRED),
             'elementid' => new external_value(PARAM_RAW, 'The ID of the element', VALUE_REQUIRED),
             'currenthash' => new external_value(PARAM_ALPHANUMEXT, 'The ID of the element', VALUE_REQUIRED),
         ]);
@@ -62,7 +61,6 @@ class get_changes extends external_api {
     public static function execute(
         int $contextid,
         string $pagehash,
-        string $pageinstance,
         string $elementid,
         string $currenthash
     ): array {
@@ -70,13 +68,11 @@ class get_changes extends external_api {
         [
             'contextid' => $contextid,
             'pagehash' => $pagehash,
-            'pageinstance' => $pageinstance,
             'elementid' => $elementid,
             'currenthash' => $currenthash,
         ] = self::validate_parameters(self::execute_parameters(), [
             'contextid' => $contextid,
             'pagehash' => $pagehash,
-            'pageinstance' => $pageinstance,
             'elementid' => $elementid,
             'currenthash' => $currenthash,
         ]);

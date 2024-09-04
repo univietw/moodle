@@ -65,18 +65,20 @@ class change_manager {
         $this->pageinstance = $pageinstance;
         $this->elementid = $elementid;
         $this->oldcontenthash = $oldcontenthash;
-        $this->autosaveid = $DB->get_field('tiny_autosave', 'id', ['elementid' => $elementid, 'contextid' => $contextid, 'pagehash' => $pagehash]);
     }
 
     public function add_collaborative_record($newcontenthash, $changes) {
-        global $DB;
+        global $DB,$USER;
 
         $record = new \stdClass();
         $record->oldcontenthash = $this->oldcontenthash;
         $record->newcontenthash = $newcontenthash;
         $record->timemodified = time();
         $record->changes = $changes;
-        $record->autosaveid = $this->autosaveid;
+        $record->pagehash = $this->pagehash;
+        $record->elementid = $this->elementid;
+        $record->oldcontenthash = $this->oldcontenthash;
+        $record->userid = $USER->id;
 
        // try {
             $record->id = $DB->insert_record('tiny_collaborative_changes', $record);
@@ -90,7 +92,11 @@ class change_manager {
         global $DB;
         $changesarray = [];
         $currenthash = $this->oldcontenthash;
-        while ($change = $DB->get_record('tiny_collaborative_changes', ['oldcontenthash' => $currenthash, 'autosaveid' => $this->autosaveid])) {
+        while ($change = $DB->get_record('tiny_collaborative_changes', ['oldcontenthash' => $currenthash, 
+            'pagehash' => $this->$pagehash,
+            'elementid' => $this->elementid,
+            'contextid' => $this->contextid,
+        )) {
             $changesarray[] = $change->changes;
             $currenthash = $change->newcontenthash;
         }
